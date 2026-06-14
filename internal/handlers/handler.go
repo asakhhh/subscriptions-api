@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"subs-app/internal/dtos"
+	"subs-app/internal/models"
 	"subs-app/internal/services"
 	"time"
 
@@ -42,38 +42,94 @@ func (h *Handler) CreateSub(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println(startDate, endDate)
-
-	// response, err := h.service.CreateSub()
+	response, err := h.service.CreateSub(&models.Subscription{
+		ID:        body.ID,
+		UserID:    body.UserID,
+		Name:      body.Name,
+		Price:     body.Price,
+		StartDate: startDate,
+		EndDate:   endDate,
+	})
+	if err != nil {
+		h.handleError(w, err)
+		return
+	}
+	respondJSON(w, http.StatusCreated, response)
 }
 
 func (h *Handler) GetSub(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if len(id) == 0 {
+	idStr := r.URL.Query().Get("id")
+	if len(idStr) == 0 {
 		respondError(w, http.StatusBadRequest, "id not provided")
 		return
 	}
-	// todo
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "id doesn't follow UUID format")
+		return
+	}
+	response, err := h.service.GetSub(id)
+	if err != nil {
+		h.handleError(w, err)
+		return
+	}
+	respondJSON(w, http.StatusOK, dtos.Subscription{
+		ID:        response.ID,
+		UserID:    response.UserID,
+		Name:      response.Name,
+		Price:     response.Price,
+		StartDate: dateToStr(response.StartDate),
+		EndDate:   dateToStr(response.EndDate),
+	})
 }
 
 func (h *Handler) UpdateSub(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if len(id) == 0 {
+	idStr := r.URL.Query().Get("id")
+	if len(idStr) == 0 {
 		respondError(w, http.StatusBadRequest, "id not provided")
 		return
 	}
-	// todo
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "id doesn't follow UUID format")
+		return
+	}
+	var body dtos.UpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		respondError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	err = h.service.UpdateSub(id, &body)
+	if err != nil {
+		h.handleError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) DeleteSub(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if len(id) == 0 {
+	idStr := r.URL.Query().Get("id")
+	if len(idStr) == 0 {
 		respondError(w, http.StatusBadRequest, "id not provided")
 		return
 	}
-	// todo
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "id doesn't follow UUID format")
+		return
+	}
+	err = h.service.DeleteSub(id)
+	if err != nil {
+		h.handleError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) AggregateSubs(w http.ResponseWriter, r *http.Request) {
+	// todo
+}
+
+func (h *Handler) handleError(w http.ResponseWriter, err error) {
 	// todo
 }
