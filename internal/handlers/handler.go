@@ -99,7 +99,29 @@ func (h *Handler) UpdateSub(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	err = h.service.UpdateSub(id, &body)
+	startDate, err := strToDate(body.StartDate)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	endDate := time.Time{}
+	if body.EndDate != "" {
+		endDate, err = strToDate(body.EndDate)
+		if err != nil {
+			respondError(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+	}
+	err = h.service.UpdateSub(id, &dtos.UpdateObject{
+		Name:            body.Name,
+		Price:           body.Price,
+		StartDate:       startDate,
+		EndDate:         endDate,
+		UpdateName:      body.UpdateName,
+		UpdatePrice:     body.UpdatePrice,
+		UpdateStartDate: body.UpdateStartDate,
+		UpdateEndDate:   body.UpdateEndDate,
+	})
 	if err != nil {
 		h.handleError(w, err)
 		return

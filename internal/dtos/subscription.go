@@ -1,6 +1,8 @@
 package dtos
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -18,13 +20,25 @@ type CreateResponse struct {
 }
 
 type UpdateRequest struct {
-	Name      string    `json:"service_name"`
-	Price     int32     `json:"price"`
-	StartDate string    `json:"start_date"`
-	EndDate   string    `json:"end_date"`
+	Name      string `json:"service_name"`
+	Price     int32  `json:"price"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
 
 	UpdateName      bool `json:"update_service_name"`
 	UpdatePrice     bool `json:"update_price"`
 	UpdateStartDate bool `json:"update_start_date"`
 	UpdateEndDate   bool `json:"update_end_date"`
+}
+
+type UpdateObject struct {
+	Name      string
+	Price     int32
+	StartDate time.Time
+	EndDate   time.Time
+
+	UpdateName      bool
+	UpdatePrice     bool
+	UpdateStartDate bool
+	UpdateEndDate   bool
 }
