@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"subs-app/internal/dtos"
 	"subs-app/internal/services"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -23,11 +25,24 @@ func (h *Handler) CreateSub(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "invalid request body")
 		return
 	} else if body.UserID == uuid.Nil || body.Name == "" ||
-		body.Price < 0 || body.StartDate.IsZero() ||
-		body.EndDate.IsZero() {
+		body.Price < 0 {
 		respondError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
+	startDate, err := strToDate(body.StartDate)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	endDate := time.Time{}
+	if body.EndDate != "" {
+		endDate, err = strToDate(body.EndDate)
+		if err != nil {
+			respondError(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+	}
+	fmt.Println(startDate, endDate)
 
 	// response, err := h.service.CreateSub()
 }
