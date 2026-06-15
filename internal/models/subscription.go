@@ -13,6 +13,6 @@ type Subscription struct {
 	Name      string         `gorm:"size:255;not null;index" json:"service_name"`
 	Price     int32          `gorm:"type:integer;not null" json:"price"`
 	StartDate time.Time      `gorm:"type:date;not null" json:"start_date"`
-	EndDate   time.Time      `gorm:"type:date" json:"end_date"`
+	EndDate   *time.Time     `gorm:"type:date" json:"end_date"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }

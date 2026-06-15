@@ -12,7 +12,7 @@ type Subscription struct {
 	Name      string    `json:"service_name"`
 	Price     int32     `json:"price"`
 	StartDate string    `json:"start_date"`
-	EndDate   string    `json:"end_date"`
+	EndDate   string    `json:"end_date,omitempty"`
 }
 
 type CreateResponse struct {
@@ -35,10 +35,23 @@ type UpdateObject struct {
 	Name      string
 	Price     int32
 	StartDate time.Time
-	EndDate   time.Time
+	EndDate   *time.Time
 
 	UpdateName      bool
 	UpdatePrice     bool
 	UpdateStartDate bool
 	UpdateEndDate   bool
+}
+
+type FilterObject struct {
+	UserID   uuid.UUID
+	Name     string
+	MinDate  time.Time
+	MaxDate  time.Time
+	ListSubs bool
+}
+
+type AggregateResult struct {
+	Subs  []*Subscription `json:"subscriptions,omitempty"`
+	Total int32           `json:"total"`
 }
