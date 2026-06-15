@@ -14,6 +14,8 @@ REST-сервис агрегации данных об онлайн подпис
   - `min_date=` и `max_date=` - по выбранному периоду
   - `list_subs=true` - запросить записи вместе с суммой
 
+Swagger UI: `http://localhost:8080/swagger/index.html`
+
 ## Docker Compose
 
 ```bash
@@ -47,3 +49,14 @@ cp .env.example .env
 go run ./cmd/api
 ./scripts/seed.sh
 ```
+
+## Swagger
+
+Документация генерируется через [swaggo/swag](https://github.com/swaggo/swag):
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal
+```
+
+После запуска сервиса: `http://localhost:8080/swagger/index.html`

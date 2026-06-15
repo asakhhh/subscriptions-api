@@ -11,8 +11,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "subs-app/docs"
 )
 
+// @title           Subscriptions API
+// @version         1.0
+// @description     REST service for aggregating online subscription data.
+// @host            localhost:8080
+// @BasePath        /
 func main() {
 	cfg := config.Load()
 
@@ -30,6 +38,8 @@ func main() {
 	service := services.NewService(repo)
 	handler := handlers.NewHandler(service)
 
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+
 	r.Post("/create_subscription", handler.CreateSub)
 	r.Get("/subscriptions", handler.GetSub)
 	r.Put("/subscriptions", handler.UpdateSub)
@@ -38,6 +48,7 @@ func main() {
 
 	addr := ":" + cfg.AppPort
 	log.Printf("server started on %v", addr)
+	log.Printf("swagger docs: http://localhost:%s/swagger/index.html", cfg.AppPort)
 	if err = http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}

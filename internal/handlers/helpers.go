@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-type errorResponse struct {
-	Message string `json:"message"`
+type ErrorResponse struct {
+	Message string `json:"message" example:"invalid request body"`
 }
 
 func respondJSON(w http.ResponseWriter, status int, payload any) {
@@ -16,5 +16,5 @@ func respondJSON(w http.ResponseWriter, status int, payload any) {
 }
 
 func respondError(w http.ResponseWriter, status int, message string) {
-	respondJSON(w, status, errorResponse{Message: message})
+	respondJSON(w, status, ErrorResponse{Message: message})
 }

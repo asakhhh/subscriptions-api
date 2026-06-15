@@ -23,6 +23,19 @@ func NewHandler(service services.Service) *Handler {
 	return &Handler{service: service}
 }
 
+// CreateSub creates a new subscription.
+//
+// @Summary      Create subscription
+// @Description  Create a subscription record. Dates use MM-YYYY format. End date is optional.
+// @Tags         subscriptions
+// @Accept       json
+// @Produce      json
+// @Param        body  body      dtos.Subscription  true  "Subscription payload"
+// @Success      201   {object}  dtos.CreateResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      409   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /create_subscription [post]
 func (h *Handler) CreateSub(w http.ResponseWriter, r *http.Request) {
 	var body dtos.Subscription
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -62,6 +75,18 @@ func (h *Handler) CreateSub(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, response)
 }
 
+// GetSub returns a subscription by ID.
+//
+// @Summary      Get subscription
+// @Description  Get a single subscription by UUID.
+// @Tags         subscriptions
+// @Produce      json
+// @Param        id    query     string  true  "Subscription UUID"
+// @Success      200   {object}  dtos.Subscription
+// @Failure      400   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /subscriptions [get]
 func (h *Handler) GetSub(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if len(idStr) == 0 {
@@ -88,6 +113,21 @@ func (h *Handler) GetSub(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// UpdateSub partially updates a subscription.
+//
+// @Summary      Update subscription
+// @Description  Update selected fields. Set update_* flags to true for fields you want to change.
+// @Tags         subscriptions
+// @Accept       json
+// @Produce      json
+// @Param        id    query     string             true  "Subscription UUID"
+// @Param        body  body      dtos.UpdateRequest true  "Update payload"
+// @Success      200
+// @Failure      400   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
+// @Failure      409   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /subscriptions [put]
 func (h *Handler) UpdateSub(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if len(idStr) == 0 {
@@ -145,6 +185,17 @@ func (h *Handler) UpdateSub(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteSub removes a subscription.
+//
+// @Summary      Delete subscription
+// @Description  Soft-delete a subscription by UUID.
+// @Tags         subscriptions
+// @Param        id    query  string  true  "Subscription UUID"
+// @Success      204
+// @Failure      400   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /subscriptions [delete]
 func (h *Handler) DeleteSub(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if len(idStr) == 0 {
@@ -164,6 +215,21 @@ func (h *Handler) DeleteSub(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// AggregateSubs calculates total subscription cost for a period.
+//
+// @Summary      Aggregate subscriptions
+// @Description  Sum monthly prices for subscriptions overlapping the selected period. Use list_subs=true to also return matching records.
+// @Tags         subscriptions
+// @Produce      json
+// @Param        user_id       query  string  false  "Filter by user UUID"
+// @Param        service_name  query  string  false  "Filter by service name"
+// @Param        min_date      query  string  false  "Period start (MM-YYYY)"
+// @Param        max_date      query  string  false  "Period end (MM-YYYY)"
+// @Param        list_subs     query  string  false  "Include subscriptions in response (true/false/1/0)"
+// @Success      200   {object}  dtos.AggregateResult
+// @Failure      400   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /subscriptions/aggregate [get]
 func (h *Handler) AggregateSubs(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 

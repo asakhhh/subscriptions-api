@@ -1,0 +1,256 @@
+basePath: /
+definitions:
+  internal_handlers.ErrorResponse:
+    properties:
+      message:
+        example: invalid request body
+        type: string
+    type: object
+  subs-app_internal_dtos.AggregateResult:
+    properties:
+      subscriptions:
+        items:
+          $ref: '#/definitions/subs-app_internal_dtos.Subscription'
+        type: array
+      total:
+        example: 2400
+        type: integer
+    type: object
+  subs-app_internal_dtos.CreateResponse:
+    properties:
+      id:
+        example: 60601fee-2bf1-4721-ae6f-7636e79a0cba
+        type: string
+    type: object
+  subs-app_internal_dtos.Subscription:
+    properties:
+      end_date:
+        example: 12-2025
+        type: string
+      id:
+        example: 60601fee-2bf1-4721-ae6f-7636e79a0cba
+        type: string
+      price:
+        example: 400
+        type: integer
+      service_name:
+        example: Yandex Plus
+        type: string
+      start_date:
+        example: 07-2025
+        type: string
+      user_id:
+        example: 60601fee-2bf1-4721-ae6f-7636e79a0cba
+        type: string
+    type: object
+  subs-app_internal_dtos.UpdateRequest:
+    properties:
+      end_date:
+        example: 12-2025
+        type: string
+      price:
+        example: 450
+        type: integer
+      service_name:
+        example: Yandex Plus
+        type: string
+      start_date:
+        example: 07-2025
+        type: string
+      update_end_date:
+        example: false
+        type: boolean
+      update_price:
+        example: true
+        type: boolean
+      update_service_name:
+        example: false
+        type: boolean
+      update_start_date:
+        example: false
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST service for aggregating online subscription data.
+  title: Subscriptions API
+  version: "1.0"
+paths:
+  /create_subscription:
+    post:
+      consumes:
+      - application/json
+      description: Create a subscription record. Dates use MM-YYYY format. End date
+        is optional.
+      parameters:
+      - description: Subscription payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/subs-app_internal_dtos.Subscription'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/subs-app_internal_dtos.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      summary: Create subscription
+      tags:
+      - subscriptions
+  /subscriptions:
+    delete:
+      description: Soft-delete a subscription by UUID.
+      parameters:
+      - description: Subscription UUID
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      summary: Delete subscription
+      tags:
+      - subscriptions
+    get:
+      description: Get a single subscription by UUID.
+      parameters:
+      - description: Subscription UUID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subs-app_internal_dtos.Subscription'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      summary: Get subscription
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Update selected fields. Set update_* flags to true for fields you
+        want to change.
+      parameters:
+      - description: Subscription UUID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/subs-app_internal_dtos.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      summary: Update subscription
+      tags:
+      - subscriptions
+  /subscriptions/aggregate:
+    get:
+      description: Sum monthly prices for subscriptions overlapping the selected period.
+        Use list_subs=true to also return matching records.
+      parameters:
+      - description: Filter by user UUID
+        in: query
+        name: user_id
+        type: string
+      - description: Filter by service name
+        in: query
+        name: service_name
+        type: string
+      - description: Period start (MM-YYYY)
+        in: query
+        name: min_date
+        type: string
+      - description: Period end (MM-YYYY)
+        in: query
+        name: max_date
+        type: string
+      - description: Include subscriptions in response (true/false/1/0)
+        in: query
+        name: list_subs
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subs-app_internal_dtos.AggregateResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      summary: Aggregate subscriptions
+      tags:
+      - subscriptions
+swagger: "2.0"

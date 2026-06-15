@@ -7,28 +7,28 @@ import (
 )
 
 type Subscription struct {
-	ID        uuid.UUID `json:"id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Name      string    `json:"service_name"`
-	Price     int32     `json:"price"`
-	StartDate string    `json:"start_date"`
-	EndDate   string    `json:"end_date,omitempty"`
+	ID        uuid.UUID `json:"id" example:"60601fee-2bf1-4721-ae6f-7636e79a0cba"`
+	UserID    uuid.UUID `json:"user_id" example:"60601fee-2bf1-4721-ae6f-7636e79a0cba"`
+	Name      string    `json:"service_name" example:"Yandex Plus"`
+	Price     int32     `json:"price" example:"400"`
+	StartDate string    `json:"start_date" example:"07-2025"`
+	EndDate   string    `json:"end_date,omitempty" example:"12-2025"`
 }
 
 type CreateResponse struct {
-	ID uuid.UUID `json:"id"`
+	ID uuid.UUID `json:"id" example:"60601fee-2bf1-4721-ae6f-7636e79a0cba"`
 }
 
 type UpdateRequest struct {
-	Name      string `json:"service_name"`
-	Price     int32  `json:"price"`
-	StartDate string `json:"start_date"`
-	EndDate   string `json:"end_date"`
+	Name      string `json:"service_name" example:"Yandex Plus"`
+	Price     int32  `json:"price" example:"450"`
+	StartDate string `json:"start_date" example:"07-2025"`
+	EndDate   string `json:"end_date" example:"12-2025"`
 
-	UpdateName      bool `json:"update_service_name"`
-	UpdatePrice     bool `json:"update_price"`
-	UpdateStartDate bool `json:"update_start_date"`
-	UpdateEndDate   bool `json:"update_end_date"`
+	UpdateName      bool `json:"update_service_name" example:"false"`
+	UpdatePrice     bool `json:"update_price" example:"true"`
+	UpdateStartDate bool `json:"update_start_date" example:"false"`
+	UpdateEndDate   bool `json:"update_end_date" example:"false"`
 }
 
 type UpdateObject struct {
@@ -53,5 +53,5 @@ type FilterObject struct {
 
 type AggregateResult struct {
 	Subs  []*Subscription `json:"subscriptions,omitempty"`
-	Total int32           `json:"total"`
+	Total int32           `json:"total" example:"2400"`
 }
